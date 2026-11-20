@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Live2D 截圖工作室</title>
+<!--
+  ===== 設定 =====
+  1) 想讓客戶一打開就看到他的模型：把模型資料夾放在這個 index.html 旁邊，
+     然後修改下面 script 裡的 DEFAULT_MODEL，例如 './model/xxx.model3.json'
+     也可以用網址參數：index.html?model=./model/xxx.model3.json
+  2) Cubism Core 的官方直連網址偶爾不穩，正式上線建議從 Live2D 官網下載
+     Cubism SDK for Web，把 live2dcubismcore.min.js 放在同資料夾並改成本地路徑。
+-->
+<style>
+  :root{
+    --bg:#f4f3f0; --panel:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e4e2dd;
+    --accent:#5b5bd6; --accent-ink:#fff; --accent-soft:#ececfb; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;font-size:14px}
+  .app{display:grid;grid-template-columns:1fr 360px;height:100vh;height:100dvh}
+  .stage-wrap{position:relative;display:flex;align-items:center;justify-content:center;padding:24px;min-height:0;overflow:hidden}
+  .stage{position:relative;box-shadow:0 10px 40px rgba(0,0,0,.12);border-radius:4px;overflow:hidden;
+    background-color:#fff;background-image:
+      linear-gradient(45deg,#e9e9e9 25%,transparent 25%),linear-gradient(-45deg,#e9e9e9 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#e9e9e9 75%),linear-gradient(-45deg,transparent 75%,#e9e9e9 75%);
+    background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+  canvas{display:block;touch-action:none;cursor:grab}
+  canvas.dragging{cursor:grabbing}
+  .empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    text-align:center;padding:24px;color:var(--muted);background:rgba(255,255,255,.85);pointer-events:none}
+  .empty b{color:var(--ink);font-size:17px}
+  .stage-wrap.drop .stage{outline:3px dashed var(--accent);outline-offset:6px}
+  .size-tag{position:absolute;left:24px;bottom:12px;color:var(--muted);font-size:12px}
+  .hint{position:absolute;right:24px;bottom:12px;color:var(--muted);font-size:12px}
+  .loading{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(244,243,240,.7);font-weight:600}
+  .loading.on{display:flex}
+
+  .panel{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+  .panel-head{padding:16px 18px 10px;border-bottom:1px solid var(--line)}
+  .panel-head h1{font-size:16px;margin:0 0 2px}
+  .panel-head p{margin:0;color:var(--muted);font-size:12px}
+  .scroll{overflow:auto;flex:1;padding:6px 0}
+  details{border-bottom:1px solid var(--line)}
+  summary{list-style:none;cursor:pointer;padding:12px 18px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"＋";color:var(--muted);font-weight:400}
+  details[open] summary::after{content:"－"}
+  .sec{padding:0 18px 14px;display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .row label{color:var(--muted);min-width:44px}
+  button,.btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;
+    padding:7px 11px;font:inherit;cursor:pointer;line-height:1.2}
+  button:hover,.btn:hover{border-color:#c9c6bf}
+  button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips button{padding:6px 10px;font-size:13px}
+  input[type=range]{flex:1;accent-color:var(--accent);min-width:80px}
+  input[type=number]{width:76px;padding:6px;border:1px solid var(--line);border-radius:8px;font:inherit}
+  input[type=color]{width:38px;height:32px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff}
+  input[type=search]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit}
+  .file-btn{position:relative;overflow:hidden}
+  .file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .note{color:var(--muted);font-size:12px;line-height:1.5}
+  .switch{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+  .switch input{width:18px;height:18px;accent-color:var(--accent)}
+  .val{width:42px;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
+  .params{display:flex;flex-direction:column;gap:2px;max-height:420px;overflow:auto;margin:0 -6px;padding:0 6px}
+  .param{display:grid;grid-template-columns:1fr auto;gap:0 6px;padding:6px 6px;border-radius:8px}
+  .param.locked{background:var(--accent-soft)}
+  .param .name{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .param .name small{color:var(--muted);margin-left:4px}
+  .param .ctrl{grid-column:1 / -1;display:flex;align-items:center;gap:6px}
+  .param .reset{padding:2px 6px;font-size:12px;visibility:hidden}
+  .param.locked .reset{visibility:visible}
+  .empty-list{color:var(--muted);font-size:13px}
+
+  .export{border-top:1px solid var(--line);padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;background:#fff}
+  .export .row{flex-wrap:nowrap}
+  .export select{padding:7px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+  .export .primary{flex:1;padding:10px}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:#1d1d1f;color:#fff;
+    padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:9;max-width:90vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:860px){
+    .app{grid-template-columns:1fr;grid-template-rows:56vh 1fr;height:auto;min-height:100dvh}
+    .stage-wrap{padding:14px;height:56vh}
+    .panel{border-left:0;border-top:1px solid var(--line)}
+    .scroll{overflow:visible}
+    .export{position:sticky;bottom:0}
+    .hint,.size-tag{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="stage-wrap" id="stageWrap">
+    <div class="stage" id="stage">
+      <canvas id="c"></canvas>
+      <div class="empty" id="empty">
+        <b>把模型資料夾或 ZIP 拖到這裡</b>
+        <span>資料夾裡要有 .model3.json、.moc3 和貼圖<br>也可以用右側「載入模型」選擇檔案</span>
+      </div>
+    </div>
+    <div class="size-tag" id="sizeTag"></div>
+    <div class="hint">拖曳移動模型 · 滾輪縮放</div>
+    <div class="loading" id="loading">模型載入中…</div>
+  </main>
+
+  <aside class="panel">
+    <div class="panel-head">
+      <h1>Live2D 截圖工作室</h1>
+      <p>調好表情和姿勢，匯出 PNG 做社群貼文</p>
+    </div>
+    <div class="scroll">
+
+      <details id="secLoad" open>
+        <summary>載入模型</summary>
+        <div class="sec">
+          <div class="row">
+            <span class="btn file-btn">選擇資料夾<input type="file" id="pickDir" webkitdirectory directory multiple></span>
+            <span class="btn file-btn">選擇 ZIP<input type="file" id="pickZip" accept=".zip,application/zip"></span>
+          </div>
+          <div class="note">檔案只在你的瀏覽器裡讀取，不會上傳到任何地方。支援 Cubism 3 以上（.model3.json）。</div>
+        </div>
+      </details>
+
+      <details open>
+        <summary>畫布尺寸</summary>
+        <div class="sec">
+          <div class="chips" id="presets"></div>
+          <div class="row">
+            <input type="number" id="cw" min="256" max="4096" value="1080"> ×
+            <input type="number" id="ch" min="256" max="4096" value="1350">
+            <button id="applySize">套用</button>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>背景與外框</summary>
+        <div class="sec">
+          <div class="chips" id="bgModes">
+            <button data-mode="transparent" class="on">透明</button>
+            <button data-mode="color">純色</button>
+            <button data-mode="image">圖片</button>
+          </div>
+          <div class="row"><label>顏色</label><input type="color" id="bgColor" value="#ffffff"></div>
+          <div class="row">
+            <span class="btn file-btn">上傳背景圖<input type="file" id="bgFile" accept="image/*"></span>
+          </div>
+          <div class="row">
+            <span class="btn file-btn">上傳外框 PNG<input type="file" id="fgFile" accept="image/png,image/webp"></span>
+            <button id="fgClear">移除外框</button>
+          </div>
+          <div class="note">外框會蓋在模型上面，適合放 Logo、文字或固定版型（建議做成跟畫布同尺寸的透明 PNG）。</div>
+        </div>
+      </details>
+
+      <details open>
+        <summary>位置</summary>
+        <div class="sec">
+          <div class="row"><label>縮放</label><input type="range" id="scale" min="10" max="400" value="100"><span class="val" id="scaleVal">100%</span></div>
+          <div class="row"><label>旋轉</label><input type="range" id="rot" min="-180" max="180" value="0"><span class="val" id="rotVal">0°</span></div>
+          <div class="row">
+            <button id="mirror">左右翻轉</button>
+            <button id="center">置中重設</button>
+          </div>
+        </div>
+      </details>
+
+      <details open>
+        <summary>表情</summary>
+        <div class="sec"><div class="chips" id="exprs"><span class="empty-list">尚未載入模型</span></div></div>
+      </details>
+
+      <details>
+        <summary>動作</summary>
+        <div class="sec"><div class="chips" id="motions"><span class="empty-list">尚未載入模型</span></div></div>
+      </details>
+
+      <details>
+        <summary>動態控制</summary>
+        <div class="sec">
+          <label class="switch">定格（暫停所有動態，方便截圖）<input type="checkbox" id="tFreeze"></label>
+          <label class="switch">自動眨眼<input type="checkbox" id="tBlink" checked></label>
+          <label class="switch">呼吸起伏<input type="checkbox" id="tBreath" checked></label>
+          <label class="switch">閒置動作<input type="checkbox" id="tIdle" checked></label>
+          <label class="switch">視線跟著游標<input type="checkbox" id="tFollow" checked></label>
+        </div>
+      </details>
+
+      <details>
+        <summary>參數微調</summary>
+        <div class="sec">
+          <input type="search" id="paramSearch" placeholder="搜尋參數（例：眼、Angle、Mouth）">
+          <div class="row"><button id="paramResetAll">全部恢復預設</button></div>
+          <div class="note">拉動後該參數會被「鎖住」不再受動作影響，按 ↺ 解除。</div>
+          <div class="params" id="params"><span class="empty-list">尚未載入模型</span></div>
+        </div>
+      </details>
+
+    </div>
+
+    <div class="export">
+      <div class="row">
+        <select id="exportScale" title="輸出倍率">
+          <option value="1">原尺寸</option>
+          <option value="2">2 倍</option>
+        </select>
+        <button class="primary" id="btnPng">下載 PNG</button>
+      </div>
+      <div class="row">
+        <button id="btnCopy" style="flex:1">複製圖片</button>
+        <button id="btnShare" style="flex:1">分享…</button>
+      </div>
+    </div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./lib/live2dcubismcore.min.js"></script>
+<script src="./lib/pixi.min.js"></script>
+<script src="./lib/cubism4.min.js"></script>
+<script src="./lib/jszip.min.js"></script>
+<script>
+(() => {
+  // 預設模型路徑（留空 = 讓使用者自己載入）
+  const DEFAULT_MODEL = './model/fangyuan_tiger/tiger.model3.json';
+
+  const $ = s => document.querySelector(s);
+  const L2D = PIXI.live2d;
+  const noop = () => {};
+
+  // ---------- toast / loading ----------
+  let toastTimer;
+  function toast(msg, ms = 2600) {
+    const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+  }
+  const setLoading = on => $('#loading').classList.toggle('on', on);
+
+  // ---------- PIXI ----------
+  let W = 1080, H = 1350;
+  const canvas = $('#c');
+  const app = new PIXI.Application({
+    view: canvas, width: W, height: H, backgroundAlpha: 0,
+    preserveDrawingBuffer: true, antialias: true, resolution: 1, autoDensity: false
+  });
+  const bgLayer = new PIXI.Container(), modelLayer = new PIXI.Container(), fgLayer = new PIXI.Container();
+  app.stage.addChild(bgLayer, modelLayer, fgLayer);
+  const bgFill = new PIXI.Graphics(); bgLayer.addChild(bgFill);
+  let bgSprite = null, fgSprite = null, bgMode = 'transparent', bgColor = '#ffffff';
+
+  function layoutBackground() {
+    bgFill.clear();
+    if (bgMode === 'color') { bgFill.beginFill(PIXI.utils.string2hex(bgColor)); bgFill.drawRect(0, 0, W, H); bgFill.endFill(); }
+    if (bgSprite) {
+      bgSprite.visible = bgMode === 'image';
+      const tw = bgSprite.texture.width, th = bgSprite.texture.height;
+      const s = Math.max(W / tw, H / th);
+      bgSprite.anchor.set(0.5); bgSprite.scale.set(s); bgSprite.position.set(W / 2, H / 2);
+    }
+    if (fgSprite) { fgSprite.width = W; fgSprite.height = H; }
+  }
+
+  function fitDisplay() {
+    const wrap = $('#stageWrap');
+    const cs = getComputedStyle(wrap);
+    const aw = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const ah = wrap.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 10;
+    const s = Math.max(0.05, Math.min(aw / W, ah / H));
+    const st = $('#stage');
+    canvas.style.width = st.style.width = Math.floor(W * s) + 'px';
+    canvas.style.height = st.style.height = Math.floor(H * s) + 'px';
+    $('#sizeTag').textContent = `${W} × ${H}`;
+  }
+  new ResizeObserver(fitDisplay).observe($('#stageWrap'));
+
+  // ---------- 畫布尺寸 ----------
+  const PRESETS = [
+    ['IG 方形 1:1', 1080, 1080], ['IG 直式 4:5', 1080, 1350], ['限動 9:16', 1080, 1920],
+    ['橫式 16:9', 1920, 1080], ['X 橫幅 3:1', 1500, 500]
+  ];
+  function setSize(w, h) {
+    w = Math.round(Math.min(4096, Math.max(256, w))); h = Math.round(Math.min(4096, Math.max(256, h)));
+    const oldW = W, oldH = H;
+    W = w; H = h;
+    app.renderer.resize(W, H);
+    if (model) {
+      model.x = model.x / oldW * W; model.y = model.y / oldH * H;
+      const k = Math.min(W / oldW, H / oldH);
+      fitScale *= k; applyTransform();
+    }
+    $('#cw').value = W; $('#ch').value = H;
+    document.querySelectorAll('#presets button').forEach(b => b.classList.toggle('on', +b.dataset.w === W && +b.dataset.h === H));
+    layoutBackground(); fitDisplay();
+  }
+  PRESETS.forEach(([name, w, h]) => {
+    const b = document.createElement('button');
+    b.textContent = name; b.dataset.w = w; b.dataset.h = h;
+    b.onclick = () => setSize(w, h);
+    $('#presets').appendChild(b);
+  });
+  $('#applySize').onclick = () => setSize(+$('#cw').value, +$('#ch').value);
+
+  // ---------- 背景 / 外框 ----------
+  document.querySelectorAll('#bgModes button').forEach(b => b.onclick = () => {
+    if (b.dataset.mode === 'image' && !bgSprite) { $('#bgFile').click(); return; }
+    setBgMode(b.dataset.mode);
+  });
+  function setBgMode(m) {
+    bgMode = m;
+    document.querySelectorAll('#bgModes button').forEach(x => x.classList.toggle('on', x.dataset.mode === m));
+    layoutBackground();
+  }
+  $('#bgColor').oninput = e => { bgColor = e.target.value; setBgMode('color'); };
+  async function textureFromFile(file) {
+    const url = URL.createObjectURL(file);
+    return PIXI.Texture.fromURL(url);
+  }
+  $('#bgFile').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    const tex = await textureFromFile(f);
+    if (bgSprite) { bgLayer.removeChild(bgSprite); bgSprite.destroy(); }
+    bgSprite = new PIXI.Sprite(tex); bgLayer.addChild(bgSprite);
+    setBgMode('image'); e.target.value = '';
+  };
+  $('#fgFile').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    const tex = await textureFromFile(f);
+    if (fgSprite) { fgLayer.removeChild(fgSprite); fgSprite.destroy(); }
+    fgSprite = new PIXI.Sprite(tex); fgLayer.addChild(fgSprite);
+    layoutBackground(); e.target.value = '';
+  };
+  $('#fgClear').onclick = () => { if (fgSprite) { fgLayer.removeChild(fgSprite); fgSprite.destroy(); fgSprite = null; } };
+
+  // ---------- 模型狀態 ----------
+  let model = null, im = null, rawParams = null, fitScale = 1, scalePct = 100, rotDeg = 0, mirror = false;
+  let currentURLs = [];
+  const overrides = new Map();
+  const toggles = { freeze: false, blink: true, breath: true, idle: true, follow: true };
+  let idleGroup = 'idle';
+
+  function applyTransform() {
+    if (!model) return;
+    const s = fitScale * scalePct / 100;
+    model.scale.set(s * (mirror ? -1 : 1), s);
+    model.rotation = rotDeg * Math.PI / 180;
+  }
+  function resetTransform() {
+    if (!model) return;
+    model.scale.set(1); model.rotation = 0;
+    const lw = Math.abs(model.width), lh = Math.abs(model.height);
+    fitScale = Math.min(W * 0.92 / lw, H * 0.95 / lh);
+    scalePct = 100; rotDeg = 0;
+    $('#scale').value = 100; $('#scaleVal').textContent = '100%';
+    $('#rot').value = 0; $('#rotVal').textContent = '0°';
+    model.position.set(W / 2, H / 2);
+    applyTransform();
+  }
+
+  $('#scale').oninput = e => { scalePct = +e.target.value; $('#scaleVal').textContent = scalePct + '%'; applyTransform(); };
+  $('#rot').oninput = e => { rotDeg = +e.target.value; $('#rotVal').textContent = rotDeg + '°'; applyTransform(); };
+  $('#mirror').onclick = e => { mirror = !mirror; e.target.classList.toggle('on', mirror); applyTransform(); };
+  $('#center').onclick = () => { mirror = false; $('#mirror').classList.remove('on'); resetTransform(); };
+
+  // ---------- 載入 ----------
+  async function loadModel(source, cdi, urls = []) {
+    setLoading(true);
+    try {
+      const m = await L2D.Live2DModel.from(source, { autoInteract: false });
+      if (model) { modelLayer.removeChild(model); model.destroy({ children: true }); }
+      currentURLs.forEach(u => URL.revokeObjectURL(u)); currentURLs = urls;
+      model = m; im = m.internalModel;
+      m.anchor.set(0.5, 0.5);
+      modelLayer.addChild(m);
+      overrides.clear();
+      setupModel(cdi);
+      mirror = false; $('#mirror').classList.remove('on');
+      resetTransform();
+      $('#empty').hidden = true;
+      $('#secLoad').open = false;
+      toast('模型已載入');
+    } catch (err) {
+      console.error(err);
+      urls.forEach(u => URL.revokeObjectURL(u));
+      toast('載入失敗：' + (err && err.message ? err.message : err), 5000);
+    } finally { setLoading(false); }
+  }
+
+  const normPath = p => p.replace(/\\/g, '/').replace(/^\.\//, '');
+  function joinPath(dir, rel) {
+    const out = [];
+    for (const part of (dir + rel).split('/')) {
+      if (part === '' || part === '.') continue;
+      if (part === '..') out.pop(); else out.push(part);
+    }
+    return out.join('/');
+  }
+
+  // entries: [{ path, blob }]
+  async function loadFromEntries(entries) {
+    entries = entries.map(e => ({ path: normPath(e.path), blob: e.blob }));
+    if (!entries.some(e => /\.model3\.json$/i.test(e.path))) {
+      const zip = entries.find(e => /\.zip$/i.test(e.path));
+      if (zip) entries = await unzip(zip.blob);
+    }
+    const mains = entries.filter(e => /\.model3\.json$/i.test(e.path)).sort((a, b) => a.path.length - b.path.length);
+    if (!mains.length) {
+      if (entries.some(e => /\.model\.json$/i.test(e.path))) toast('這是 Cubism 2 的舊格式模型，目前只支援 Cubism 3 以上（.model3.json）', 5000);
+      else toast('找不到 .model3.json，請選擇完整的模型資料夾', 4000);
+      return;
+    }
+    const main = mains[0];
+    const dir = main.path.includes('/') ? main.path.slice(0, main.path.lastIndexOf('/') + 1) : '';
+    const byPath = new Map(entries.map(e => [e.path.toLowerCase(), e.blob]));
+    const urls = [], cache = new Map();
+
+    const findBlob = rel => {
+      let r = rel; try { r = decodeURI(rel); } catch (_) {}
+      for (const cand of [r, rel]) {
+        const b = byPath.get(joinPath(dir, normPath(cand)).toLowerCase());
+        if (b) return b;
+      }
+      const base = r.split('/').pop().toLowerCase();
+      const hits = entries.filter(e => e.path.toLowerCase().split('/').pop() === base);
+      return hits.length === 1 ? hits[0].blob : null;
+    };
+    const resolve = rel => {
+      if (cache.has(rel)) return cache.get(rel);
+      const b = findBlob(rel);
+      if (!b) throw new Error('缺少檔案：' + rel);
+      const u = URL.createObjectURL(b); urls.push(u); cache.set(rel, u);
+      return u;
+    };
+
+    const json = JSON.parse(await main.blob.text());
+    const fr = json.FileReferences || {};
+    // 移除找不到的非必要檔案，避免整個模型載入失敗
+    for (const k of ['Physics', 'Pose', 'UserData', 'DisplayInfo']) if (fr[k] && !findBlob(fr[k])) delete fr[k];
+    if (Array.isArray(fr.Expressions)) fr.Expressions = fr.Expressions.filter(x => x.File && findBlob(x.File));
+    if (fr.Motions) for (const g of Object.keys(fr.Motions)) {
+      fr.Motions[g] = (fr.Motions[g] || []).filter(m => m.File && findBlob(m.File));
+      fr.Motions[g].forEach(m => { if (m.Sound && !findBlob(m.Sound)) delete m.Sound; });
+    }
+    let cdi = null;
+    if (fr.DisplayInfo) { try { cdi = JSON.parse(await findBlob(fr.DisplayInfo).text()); } catch (_) {} }
+
+    json.url = 'local/' + main.path;
+    const settings = new L2D.Cubism4ModelSettings(json);
+    settings.resolveURL = resolve; // 所有相對路徑都改指向本機檔案
+    await loadModel(settings, cdi, urls);
+  }
+
+  async function unzip(blob) {
+    const zip = await JSZip.loadAsync(blob);
+    const out = [];
+    const files = Object.values(zip.files).filter(f => !f.dir && !/(^|\/)__MACOSX\//.test(f.name));
+    for (const f of files) out.push({ path: f.name, blob: await f.async('blob') });
+    return out;
+  }
+
+  async function loadFromURL(url) {
+    let cdi = null;
+    try {
+      const abs = new URL(url, location.href);
+      const j = await (await fetch(abs)).json();
+      const di = j.FileReferences && j.FileReferences.DisplayInfo;
+      if (di) cdi = await (await fetch(new URL(di, abs))).json();
+    } catch (_) {}
+    await loadModel(url, cdi);
+  }
+
+  $('#pickDir').onchange = e => {
+    const files = [...e.target.files];
+    if (files.length) loadFromEntries(files.map(f => ({ path: f.webkitRelativePath || f.name, blob: f })));
+    e.target.value = '';
+  };
+  $('#pickZip').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    setLoading(true);
+    try { await loadFromEntries(await unzip(f)); } catch (err) { toast('ZIP 讀取失敗：' + err.message, 4000); }
+    finally { setLoading(false); e.target.value = ''; }
+  };
+
+  // 拖曳資料夾 / ZIP
+  const wrap = $('#stageWrap');
+  ['dragenter', 'dragover'].forEach(t => wrap.addEventListener(t, e => { e.preventDefault(); wrap.classList.add('drop'); }));
+  ['dragleave', 'drop'].forEach(t => wrap.addEventListener(t, e => { e.preventDefault(); if (t === 'dragleave' && wrap.contains(e.relatedTarget)) return; wrap.classList.remove('drop'); }));
+  wrap.addEventListener('drop', async e => {
+    const dt = e.dataTransfer;
+    const roots = [...dt.items].filter(i => i.kind === 'file').map(i => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+    const plain = [...dt.files];
+    setLoading(true);
+    try {
+      const entries = [];
+      const walk = async (entry, prefix) => {
+        if (entry.isFile) {
+          const file = await new Promise((res, rej) => entry.file(res, rej));
+          entries.push({ path: prefix + file.name, blob: file });
+        } else if (entry.isDirectory) {
+          const reader = entry.createReader();
+          let batch;
+          do {
+            batch = await new Promise((res, rej) => reader.readEntries(res, rej));
+            for (const c of batch) await walk(c, prefix + entry.name + '/');
+          } while (batch.length);
+        }
+      };
+      if (roots.length) for (const r of roots) await walk(r, '');
+      else plain.forEach(f => entries.push({ path: f.name, blob: f }));
+      await loadFromEntries(entries);
+    } catch (err) { toast('讀取失敗：' + err.message, 4000); }
+    finally { setLoading(false); }
+  });
+
+  // ---------- 模型 UI ----------
+  function setupModel(cdi) {
+    const s = im.settings;
+
+    // 表情
+    const ex = $('#exprs'); ex.innerHTML = '';
+    const exprs = s.expressions || [];
+    if (!exprs.length) ex.innerHTML = '<span class="empty-list">這個模型沒有表情檔</span>';
+    else {
+      const none = document.createElement('button'); none.textContent = '預設'; none.className = 'on';
+      none.onclick = () => { const em = im.motionManager.expressionManager; em && em.resetExpression(); mark(none); };
+      ex.appendChild(none);
+      exprs.forEach((e, i) => {
+        const b = document.createElement('button');
+        b.textContent = (e.Name || e.name || ('表情 ' + (i + 1))).replace(/\.exp3\.json$/i, '');
+        b.onclick = () => { model.expression(i); mark(b); };
+        ex.appendChild(b);
+      });
+      function mark(b) { ex.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }
+    }
+
+    // 動作
+    const mo = $('#motions'); mo.innerHTML = '';
+    const groups = s.motions || {};
+    let count = 0;
+    for (const g of Object.keys(groups)) {
+      (groups[g] || []).forEach((m, i) => {
+        count++;
+        const file = (m.File || m.file || '').split('/').pop().replace(/\.motion3\.json$/i, '');
+        const b = document.createElement('button');
+        b.textContent = file || `${g || '動作'} ${i + 1}`;
+        b.title = `群組：${g || '(未命名)'}`;
+        b.onclick = () => model.motion(g, i, L2D.MotionPriority.FORCE);
+        mo.appendChild(b);
+      });
+    }
+    if (!count) mo.innerHTML = '<span class="empty-list">這個模型沒有動作檔</span>';
+
+    // 參數
+    const box = $('#params'); box.innerHTML = '';
+    const raw = im.coreModel && im.coreModel._model;
+    rawParams = raw ? raw.parameters : null;
+    if (!rawParams) { box.innerHTML = '<span class="empty-list">無法讀取參數</span>'; }
+    else {
+      const names = {};
+      if (cdi && Array.isArray(cdi.Parameters)) cdi.Parameters.forEach(p => names[p.Id] = p.Name);
+      for (let i = 0; i < rawParams.count; i++) {
+        const id = rawParams.ids[i], min = rawParams.minimumValues[i], max = rawParams.maximumValues[i], def = rawParams.defaultValues[i];
+        const row = document.createElement('div'); row.className = 'param';
+        row.dataset.search = ((names[id] || '') + ' ' + id).toLowerCase();
+        const step = (max - min) / 200;
+        row.innerHTML = `<div class="name">${esc(names[id] || id)}${names[id] ? `<small>${esc(id)}</small>` : ''}</div>
+          <button class="reset" title="解除鎖定">↺</button>
+          <div class="ctrl"><input type="range" min="${min}" max="${max}" step="${step}" value="${def}"><span class="val">${fmt(def)}</span></div>`;
+        const range = row.querySelector('input'), val = row.querySelector('.val');
+        range.oninput = () => { const v = +range.value; overrides.set(i, v); val.textContent = fmt(v); row.classList.add('locked'); };
+        row.querySelector('.reset').onclick = () => { overrides.delete(i); range.value = def; val.textContent = fmt(def); row.classList.remove('locked'); };
+        box.appendChild(row);
+      }
+    }
+    $('#paramSearch').value = '';
+
+    // 參數覆寫：動作更新後（讓物理跟著動）+ 最終渲染前（確保數值精準）
+    im.on('afterMotionUpdate', applyOverrides);
+    im.on('beforeModelUpdate', applyOverrides);
+
+    idleGroup = im.motionManager.groups.idle;
+    applyToggles();
+  }
+  function applyOverrides() {
+    if (!rawParams || !overrides.size) return;
+    const v = rawParams.values;
+    overrides.forEach((val, i) => { v[i] = val; });
+  }
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const fmt = v => (Math.abs(v) >= 10 ? v.toFixed(0) : v.toFixed(2));
+
+  $('#paramSearch').oninput = e => {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('#params .param').forEach(r => r.style.display = !q || r.dataset.search.includes(q) ? '' : 'none');
+  };
+  $('#paramResetAll').onclick = () => document.querySelectorAll('#params .param.locked .reset').forEach(b => b.click());
+
+  // ---------- 動態開關 ----------
+  function setMethod(obj, name, enabled) {
+    if (!obj) return;
+    if (enabled) delete obj[name]; else obj[name] = noop;
+  }
+  function applyToggles() {
+    if (!model) return;
+    model.autoUpdate = !toggles.freeze;
+    setMethod(im.eyeBlink, 'updateParameters', toggles.blink);
+    setMethod(im.breath, 'updateParameters', toggles.breath);
+    const mm = im.motionManager;
+    if (toggles.idle) mm.groups.idle = idleGroup;
+    else { mm.groups.idle = '__idle_off__'; mm.stopAllMotions(); }
+    if (!toggles.follow) im.focusController.focus(0, 0);
+  }
+  [['#tFreeze', 'freeze'], ['#tBlink', 'blink'], ['#tBreath', 'breath'], ['#tIdle', 'idle'], ['#tFollow', 'follow']].forEach(([sel, key]) => {
+    $(sel).onchange = e => { toggles[key] = e.target.checked; applyToggles(); };
+  });
+
+  // ---------- 滑鼠 / 觸控 ----------
+  const toStage = e => {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height };
+  };
+  let drag = null;
+  canvas.addEventListener('pointerdown', e => {
+    if (!model) return;
+    const p = toStage(e);
+    drag = { dx: model.x - p.x, dy: model.y - p.y };
+    canvas.setPointerCapture(e.pointerId); canvas.classList.add('dragging');
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (!model) return;
+    const p = toStage(e);
+    if (drag) { model.x = p.x + drag.dx; model.y = p.y + drag.dy; }
+    else if (toggles.follow && !toggles.freeze) model.focus(p.x, p.y);
+  });
+  const endDrag = () => { drag = null; canvas.classList.remove('dragging'); };
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+  canvas.addEventListener('wheel', e => {
+    if (!model) return;
+    e.preventDefault();
+    scalePct = Math.min(400, Math.max(10, Math.round(scalePct * (e.deltaY < 0 ? 1.06 : 1 / 1.06))));
+    $('#scale').value = scalePct; $('#scaleVal').textContent = scalePct + '%';
+    applyTransform();
+  }, { passive: false });
+
+  // ---------- 匯出 ----------
+  function renderBlob(k) {
+    const r = app.renderer, old = r.resolution;
+    r.resolution = k; r.resize(W, H); r.render(app.stage);
+    return new Promise(res => {
+      canvas.toBlob(b => { r.resolution = old; r.resize(W, H); fitDisplay(); res(b); }, 'image/png');
+    });
+  }
+  const fileName = () => {
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    return `live2d_${W}x${H}_${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}.png`;
+  };
+  const needModel = () => { if (!model) { toast('請先載入模型'); return true; } return false; };
+
+  $('#btnPng').onclick = async () => {
+    if (needModel()) return;
+    const blob = await renderBlob(+$('#exportScale').value);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = fileName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    toast('已下載 PNG');
+  };
+  $('#btnCopy').onclick = async () => {
+    if (needModel()) return;
+    try {
+      const blob = await renderBlob(+$('#exportScale').value);
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      toast('已複製，可以直接貼上');
+    } catch (_) { toast('這個瀏覽器不支援複製圖片，請改用下載'); }
+  };
+  $('#btnShare').onclick = async () => {
+    if (needModel()) return;
+    const blob = await renderBlob(+$('#exportScale').value);
+    const file = new File([blob], fileName(), { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); } catch (_) {}
+    } else toast('這個瀏覽器不支援分享，請改用下載');
+  };
+
+  // ---------- 啟動 ----------
+  setSize(1080, 1350);
+  const q = new URLSearchParams(location.search).get('model') || DEFAULT_MODEL;
+  if (q) loadFromURL(q);
+
+  window.__studio = { get model() { return model; }, loadFromEntries, setSize };
+})();
+</script>
+</body>
+</html>

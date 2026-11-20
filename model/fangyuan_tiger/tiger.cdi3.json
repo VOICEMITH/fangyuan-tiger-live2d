@@ -1,0 +1,395 @@
+{
+	"Version": 3,
+	"Parameters": [
+		{
+			"Id": "Param_ichi",
+			"GroupId": "ParamGroup2",
+			"Name": "姿勢位置切換"
+		},
+		{
+			"Id": "Param4",
+			"GroupId": "ParamGroup2",
+			"Name": "站姿限制"
+		},
+		{
+			"Id": "Param_HAPPY",
+			"GroupId": "ParamGroup2",
+			"Name": "開心效果"
+		},
+		{
+			"Id": "Param_OKORI",
+			"GroupId": "ParamGroup2",
+			"Name": "生氣效果"
+		},
+		{
+			"Id": "Param_KIRA",
+			"GroupId": "ParamGroup2",
+			"Name": "亮晶晶效果"
+		},
+		{
+			"Id": "Param_WOW",
+			"GroupId": "ParamGroup2",
+			"Name": "驚嘆號_開"
+		},
+		{
+			"Id": "Param_TACHI",
+			"GroupId": "ParamGroup2",
+			"Name": "站姿"
+		},
+		{
+			"Id": "Param_TACHI2",
+			"GroupId": "ParamGroup2",
+			"Name": "趴姿"
+		},
+		{
+			"Id": "Param_TACHI3",
+			"GroupId": "ParamGroup2",
+			"Name": "坐姿"
+		},
+		{
+			"Id": "Param_TACHI4",
+			"GroupId": "ParamGroup2",
+			"Name": "捧方糖"
+		},
+		{
+			"Id": "Param_WOW_ME2",
+			"GroupId": "ParamGroup2",
+			"Name": "一般_眼睛"
+		},
+		{
+			"Id": "Param_WOW_ME3",
+			"GroupId": "ParamGroup2",
+			"Name": "怒_眼睛"
+		},
+		{
+			"Id": "Param_WOW_ME",
+			"GroupId": "ParamGroup2",
+			"Name": "驚恐_眼睛"
+		},
+		{
+			"Id": "Param_KIRA_ME",
+			"GroupId": "ParamGroup2",
+			"Name": "閃亮_眼睛"
+		},
+		{
+			"Id": "Param_KIRA_ME2",
+			"GroupId": "ParamGroup2",
+			"Name": "愛心_眼睛"
+		},
+		{
+			"Id": "Param_KIRA_ME3",
+			"GroupId": "ParamGroup2",
+			"Name": "怒_嘴巴"
+		},
+		{
+			"Id": "Param_KIRA_ME4",
+			"GroupId": "ParamGroup2",
+			"Name": "一般_嘴巴"
+		},
+		{
+			"Id": "ParamAngleX",
+			"GroupId": "ParamGroup",
+			"Name": "角度 X"
+		},
+		{
+			"Id": "ParamAngleY",
+			"GroupId": "ParamGroup",
+			"Name": "角度 Y"
+		},
+		{
+			"Id": "ParamAngleZ",
+			"GroupId": "ParamGroup",
+			"Name": "角度 Z"
+		},
+		{
+			"Id": "ParamBodyAngleX",
+			"GroupId": "ParamGroup",
+			"Name": "身体旋转 X"
+		},
+		{
+			"Id": "ParamBodyAngleY",
+			"GroupId": "ParamGroup",
+			"Name": "身体旋转 Y"
+		},
+		{
+			"Id": "ParamBodyAngleZ",
+			"GroupId": "ParamGroup",
+			"Name": "身体旋转 Z"
+		},
+		{
+			"Id": "ParamBreath",
+			"GroupId": "ParamGroup",
+			"Name": "呼吸"
+		},
+		{
+			"Id": "Param2",
+			"GroupId": "ParamGroup3",
+			"Name": "耳朵_物理A"
+		},
+		{
+			"Id": "Param3",
+			"GroupId": "ParamGroup3",
+			"Name": "耳朵_物理B"
+		},
+		{
+			"Id": "Param5",
+			"GroupId": "ParamGroup4",
+			"Name": "音量"
+		},
+		{
+			"Id": "ParamEyeLOpen",
+			"GroupId": "ParamGroup5",
+			"Name": "左眼 开闭"
+		},
+		{
+			"Id": "ParamEyeLSmile",
+			"GroupId": "ParamGroup5",
+			"Name": "左眼 微笑"
+		},
+		{
+			"Id": "ParamEyeROpen",
+			"GroupId": "ParamGroup5",
+			"Name": "右眼 开闭"
+		},
+		{
+			"Id": "ParamEyeRSmile",
+			"GroupId": "ParamGroup5",
+			"Name": "右眼 微笑"
+		},
+		{
+			"Id": "ParamEyeROpen2",
+			"GroupId": "ParamGroup5",
+			"Name": "右眼 开闭_怒"
+		},
+		{
+			"Id": "Param11",
+			"GroupId": "ParamGroup5",
+			"Name": "愛心_M"
+		},
+		{
+			"Id": "Param6",
+			"GroupId": "ParamGroup5",
+			"Name": "高光_M"
+		},
+		{
+			"Id": "Param9",
+			"GroupId": "ParamGroup5",
+			"Name": "高光_H"
+		},
+		{
+			"Id": "Param8",
+			"GroupId": "ParamGroup5",
+			"Name": "閃亮_物理M"
+		},
+		{
+			"Id": "Param7",
+			"GroupId": "ParamGroup5",
+			"Name": "眼睛整體物理_M"
+		},
+		{
+			"Id": "Param10",
+			"GroupId": "ParamGroup5",
+			"Name": "眼睛整體物理_H"
+		},
+		{
+			"Id": "ParamEyeBallX",
+			"GroupId": "ParamGroup5",
+			"Name": "眼珠 X"
+		},
+		{
+			"Id": "ParamEyeBallY",
+			"GroupId": "ParamGroup5",
+			"Name": "眼珠 Y"
+		},
+		{
+			"Id": "ParamBrowLY",
+			"GroupId": "ParamGroup5",
+			"Name": "左眉 上下"
+		},
+		{
+			"Id": "ParamBrowRY",
+			"GroupId": "ParamGroup5",
+			"Name": "右眉 上下"
+		},
+		{
+			"Id": "ParamBrowLAngle",
+			"GroupId": "ParamGroup5",
+			"Name": "左眉 角度"
+		},
+		{
+			"Id": "ParamBrowRAngle",
+			"GroupId": "ParamGroup5",
+			"Name": "右眉 角度"
+		},
+		{
+			"Id": "ParamMouthForm",
+			"GroupId": "ParamGroup6",
+			"Name": "嘴 变形"
+		},
+		{
+			"Id": "ParamMouthOpenY",
+			"GroupId": "ParamGroup6",
+			"Name": "嘴 开闭"
+		},
+		{
+			"Id": "Param_Angle_Rotation_1_ArtMesh72",
+			"GroupId": "ParamGroup8",
+			"Name": "[0]尾巴"
+		},
+		{
+			"Id": "Param_Angle_Rotation_2_ArtMesh71",
+			"GroupId": "ParamGroup8",
+			"Name": "[1]尾巴"
+		},
+		{
+			"Id": "Param_Angle_Rotation_3_ArtMesh71",
+			"GroupId": "ParamGroup8",
+			"Name": "[2]尾巴"
+		},
+		{
+			"Id": "Param_Angle_Rotation_4_ArtMesh71",
+			"GroupId": "ParamGroup8",
+			"Name": "[3]尾巴"
+		},
+		{
+			"Id": "Param_Angle_Rotation_5_ArtMesh71",
+			"GroupId": "ParamGroup8",
+			"Name": "[4]尾巴"
+		},
+		{
+			"Id": "Param_Angle_Rotation_6_ArtMesh71",
+			"GroupId": "ParamGroup8",
+			"Name": "[5]尾巴"
+		},
+		{
+			"Id": "Param_Angle_Rotation_7_ArtMesh71",
+			"GroupId": "ParamGroup8",
+			"Name": "[6]尾巴"
+		},
+		{
+			"Id": "Param_Angle_Rotation_8_ArtMesh71",
+			"GroupId": "ParamGroup8",
+			"Name": "[7]尾巴"
+		},
+		{
+			"Id": "Param_Angle_Rotation_9_ArtMesh71",
+			"GroupId": "ParamGroup8",
+			"Name": "[8]尾巴"
+		},
+		{
+			"Id": "Param",
+			"GroupId": "ParamGroup7",
+			"Name": "軟Q_BR"
+		}
+	],
+	"ParameterGroups": [
+		{
+			"Id": "ParamGroup2",
+			"GroupId": "",
+			"Name": "差分"
+		},
+		{
+			"Id": "ParamGroup",
+			"GroupId": "",
+			"Name": "XYZ"
+		},
+		{
+			"Id": "ParamGroup3",
+			"GroupId": "",
+			"Name": "耳朵物理"
+		},
+		{
+			"Id": "ParamGroup4",
+			"GroupId": "",
+			"Name": "音量控制"
+		},
+		{
+			"Id": "ParamGroup5",
+			"GroupId": "",
+			"Name": "眉眼"
+		},
+		{
+			"Id": "ParamGroup6",
+			"GroupId": "",
+			"Name": "嘴巴"
+		},
+		{
+			"Id": "ParamGroup8",
+			"GroupId": "",
+			"Name": "尾巴"
+		},
+		{
+			"Id": "ParamGroup7",
+			"GroupId": "",
+			"Name": "軟Q"
+		}
+	],
+	"Parts": [
+		{
+			"Id": "Part20",
+			"Name": "拆件_CSP.psd(未找到对应图层)"
+		},
+		{
+			"Id": "Part15",
+			"Name": "拆件_CSP.psd(未找到对应图层)"
+		},
+		{
+			"Id": "Part",
+			"Name": "各式效果"
+		},
+		{
+			"Id": "Part2",
+			"Name": "拆件"
+		},
+		{
+			"Id": "ArtMesh70_Skinning2",
+			"Name": "尾巴(蒙皮)"
+		},
+		{
+			"Id": "Part13",
+			"Name": "尾巴(旋转)"
+		},
+		{
+			"Id": "Part9",
+			"Name": "拆件"
+		},
+		{
+			"Id": "Part3",
+			"Name": "頭"
+		},
+		{
+			"Id": "Part10",
+			"Name": "頭"
+		},
+		{
+			"Id": "Part4",
+			"Name": "眼睛_怒"
+		},
+		{
+			"Id": "Part5",
+			"Name": "眼睛_一般"
+		},
+		{
+			"Id": "Part6",
+			"Name": "嘴鼻_怒"
+		},
+		{
+			"Id": "Part7",
+			"Name": "嘴鼻"
+		},
+		{
+			"Id": "Part11",
+			"Name": "眼睛_怒"
+		},
+		{
+			"Id": "Part12",
+			"Name": "眼睛_一般"
+		}
+	],
+	"CombinedParameters": [
+		[
+			"ParamMouthForm",
+			"ParamMouthOpenY"
+		]
+	]
+}

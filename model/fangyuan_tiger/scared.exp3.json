@@ -1,0 +1,61 @@
+{
+    "Type": "Live2D Expression",
+    "IsModelCustomizationExpression": false,
+    "Parameters": [
+        {
+            "Id": "Param_HAPPY",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_OKORI",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_KIRA",
+            "Value": 1.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_WOW",
+            "Value": 1.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_WOW_ME2",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_WOW_ME3",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_WOW_ME",
+            "Value": 1.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_KIRA_ME",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_KIRA_ME2",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_KIRA_ME3",
+            "Value": 1.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_KIRA_ME4",
+            "Value": -1.0,
+            "Blend": "Add"
+        }
+    ]
+}

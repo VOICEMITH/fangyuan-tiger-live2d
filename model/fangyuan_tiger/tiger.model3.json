@@ -1,0 +1,65 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "tiger.moc3",
+		"Textures": [
+			"tiger.8192/texture_00.png"
+		],
+		"Physics": "tiger.physics3.json",
+		"DisplayInfo": "tiger.cdi3.json",
+		"Expressions": [
+			{
+				"Name": "亮晶晶",
+				"File": "sparkle.exp3.json"
+			},
+			{
+				"Name": "坐姿",
+				"File": "pose_sit.exp3.json"
+			},
+			{
+				"Name": "姿勢位置切換",
+				"File": "pose_switch.exp3.json"
+			},
+			{
+				"Name": "愛心眼",
+				"File": "heart_eyes.exp3.json"
+			},
+			{
+				"Name": "捧方糖",
+				"File": "hold_sugar.exp3.json"
+			},
+			{
+				"Name": "生氣",
+				"File": "angry.exp3.json"
+			},
+			{
+				"Name": "站姿",
+				"File": "pose_stand.exp3.json"
+			},
+			{
+				"Name": "笑臉",
+				"File": "smile.exp3.json"
+			},
+			{
+				"Name": "趴姿",
+				"File": "pose_lie.exp3.json"
+			},
+			{
+				"Name": "驚恐",
+				"File": "scared.exp3.json"
+			}
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		}
+	]
+}
