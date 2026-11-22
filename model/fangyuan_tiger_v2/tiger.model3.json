@@ -9,44 +9,52 @@
 		"DisplayInfo": "tiger.cdi3.json",
 		"Expressions": [
 			{
-				"Name": "亮晶晶",
-				"File": "sparkle.exp3.json"
+				"Name": "生氣",
+				"File": "angry.exp3.json"
 			},
 			{
-				"Name": "坐姿",
-				"File": "pose_sit.exp3.json"
-			},
-			{
-				"Name": "姿勢位置切換",
-				"File": "pose_switch.exp3.json"
+				"Name": "驚恐",
+				"File": "scared.exp3.json"
 			},
 			{
 				"Name": "愛心眼",
 				"File": "heart_eyes.exp3.json"
 			},
 			{
-				"Name": "捧方糖",
-				"File": "hold_sugar.exp3.json"
-			},
-			{
-				"Name": "生氣",
-				"File": "angry.exp3.json"
-			},
-			{
-				"Name": "站姿",
-				"File": "pose_stand.exp3.json"
+				"Name": "亮晶晶",
+				"File": "sparkle.exp3.json"
 			},
 			{
 				"Name": "笑臉",
 				"File": "smile.exp3.json"
 			},
 			{
+				"Name": "站姿",
+				"File": "pose_stand.exp3.json"
+			},
+			{
+				"Name": "坐姿",
+				"File": "pose_sit.exp3.json"
+			},
+			{
 				"Name": "趴姿",
 				"File": "pose_lie.exp3.json"
 			},
 			{
-				"Name": "驚恐",
-				"File": "scared.exp3.json"
+				"Name": "捧方糖",
+				"File": "hold_sugar.exp3.json"
+			},
+			{
+				"Name": "揮手左",
+				"File": "wave_left.exp3.json"
+			},
+			{
+				"Name": "揮手右",
+				"File": "wave_right.exp3.json"
+			},
+			{
+				"Name": "姿勢位置切換",
+				"File": "pose_switch.exp3.json"
 			}
 		]
 	},

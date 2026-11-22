@@ -1,0 +1,36 @@
+{
+    "Type": "Live2D Expression",
+    "IsModelCustomizationExpression": false,
+    "Parameters": [
+        {
+            "Id": "Param12",
+            "Value": 1.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param13",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_TACHI",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_TACHI2",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_TACHI3",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "Param_TACHI4",
+            "Value": 0.0,
+            "Blend": "Add"
+        }
+    ]
+}

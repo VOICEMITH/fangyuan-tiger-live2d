@@ -2,9 +2,14 @@
 	"Version": 3,
 	"Parameters": [
 		{
-			"Id": "Param_ichi",
+			"Id": "Param12",
 			"GroupId": "ParamGroup2",
-			"Name": "姿勢位置切換"
+			"Name": "揮手<"
+		},
+		{
+			"Id": "Param13",
+			"GroupId": "ParamGroup2",
+			"Name": "揮手>"
 		},
 		{
 			"Id": "Param4",
@@ -280,6 +285,11 @@
 			"Id": "Param",
 			"GroupId": "ParamGroup7",
 			"Name": "軟Q_BR"
+		},
+		{
+			"Id": "Param14",
+			"GroupId": "ParamGroup9",
+			"Name": "揮手"
 		}
 	],
 	"ParameterGroups": [
@@ -322,9 +332,18 @@
 			"Id": "ParamGroup7",
 			"GroupId": "",
 			"Name": "軟Q"
+		},
+		{
+			"Id": "ParamGroup9",
+			"GroupId": "",
+			"Name": "揮手物理"
 		}
 	],
 	"Parts": [
+		{
+			"Id": "Part22",
+			"Name": "拆件_CSP.psd(未找到对应图层)"
+		},
 		{
 			"Id": "Part20",
 			"Name": "拆件_CSP.psd(未找到对应图层)"
@@ -339,6 +358,10 @@
 		},
 		{
 			"Id": "Part2",
+			"Name": "拆件"
+		},
+		{
+			"Id": "Part14",
 			"Name": "拆件"
 		},
 		{
